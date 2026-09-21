@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [ main, master ]
   pull_request:
-    branches: [main, master]
+    branches: [ main, master ]
   schedule:
     # Nightly full regression at 07:00 UTC (02:00 EST)
     - cron: '0 7 * * *'
@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox]
+        browser: [ chromium, firefox ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -76,6 +76,7 @@ jobs:
           name: smoke-report-${{ matrix.browser }}
           path: playwright-report/
           retention-days: 14
+          if-no-files-found: ignore
 
       - name: Upload test results (traces, videos, screenshots)
         if: always()
@@ -84,6 +85,7 @@ jobs:
           name: smoke-results-${{ matrix.browser }}
           path: test-results/
           retention-days: 14
+          if-no-files-found: ignore
 
   # ============================================================
   # Regression Tests: nightly and manual only, both browsers
@@ -98,7 +100,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox]
+        browser: [ chromium, firefox ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -125,6 +127,7 @@ jobs:
           name: regression-report-${{ matrix.browser }}
           path: playwright-report/
           retention-days: 14
+          if-no-files-found: ignore
 
       - name: Upload test results
         if: always()
@@ -133,3 +136,4 @@ jobs:
           name: regression-results-${{ matrix.browser }}
           path: test-results/
           retention-days: 14
+          if-no-files-found: ignore

@@ -7,7 +7,7 @@ test.describe('Login @smoke', () => {
     await loginPage.login(USERS.standard.username, USERS.standard.password);
 
     await expect(inventoryPage.title).toHaveText('Products');
-    await expect(await inventoryPage.getItemCount()).toBeGreaterThan(0);
+    await expect(inventoryPage.inventoryItems).toHaveCount(6);
   });
 
   test('locked out user sees an error message', async ({ loginPage }) => {
