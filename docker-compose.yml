@@ -1,0 +1,12 @@
+services:
+  playwright:
+    build: .
+    init: true
+    ipc: host
+    environment:
+      - CI=true
+    volumes:
+      # Mount reports back to the host so they survive the container exiting
+      - ./playwright-report:/home/pwuser/app/playwright-report
+      - ./test-results:/home/pwuser/app/test-results
+    command: npx playwright test

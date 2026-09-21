@@ -56,6 +56,7 @@ import { LoginPage } from '@pages/login-page';
 - Node.js **20 or later**
 - npm
 - Internet access to Sauce Demo
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (optional, for containerized test execution)
 
 ## Installation
 
@@ -67,6 +68,67 @@ npx playwright install
 ```
 
 `npm ci` installs the exact dependency versions recorded in `package-lock.json`. Use `npx playwright install` again after upgrading Playwright to install its matching browser binaries.
+
+## Running Tests with Docker
+
+Docker provides a reproducible test environment with the Playwright browser dependencies already installed. The `Dockerfile` uses the official, version-pinned Playwright image, installs dependencies from the lockfile, and runs tests as the non-root `pwuser`. The image version matches the framework's `@playwright/test` version.
+
+The Compose service sets `CI=true`, so containerized runs execute the Chromium and Firefox projects by default. Runs are headless; use local `--headed` or `--ui` commands when visual browser interaction is required.
+
+### Build the Image
+
+```bash
+# Build the image directly
+docker build -t playwright-tests .
+
+# Or build the service defined in docker-compose.yml
+docker compose build playwright
+```
+
+### Run with Docker
+
+```bash
+# Run all test suites in the image (Chromium and Firefox)
+docker run --rm playwright-tests
+
+# Run the smoke suite in the image
+docker run --rm playwright-tests npx playwright test tests/smoke
+
+# Run the regression suite in the image
+docker run --rm playwright-tests npx playwright test tests/regression
+
+# Run a single browser project
+docker run --rm playwright-tests npx playwright test --project=chromium
+docker run --rm playwright-tests npx playwright test --project=firefox
+```
+
+### Run with Docker Compose
+
+Docker Compose is recommended for local container runs because it mounts `playwright-report/` and `test-results/` back to the host. Those artifacts remain available after the container exits.
+
+```bash
+# Build and run all tests in Chromium and Firefox
+docker compose run --rm --build playwright
+
+# Smoke only
+docker compose run --rm playwright npx playwright test tests/smoke
+
+# Regression only
+docker compose run --rm playwright npx playwright test tests/regression
+
+# A specific browser
+docker compose run --rm playwright npx playwright test --project=chromium
+docker compose run --rm playwright npx playwright test --project=firefox
+
+# Combine suite and browser selection
+docker compose run --rm playwright npx playwright test tests/smoke --project=chromium
+docker compose run --rm playwright npx playwright test tests/regression --project=firefox
+
+# Run one test file
+docker compose run --rm playwright npx playwright test tests/smoke/login.spec.ts
+```
+
+Use `--rm` to remove the stopped test container automatically. The Compose configuration also enables an init process and uses `ipc: host`, which helps Playwright browsers run reliably in containers. If Docker cannot connect, start Docker Desktop and verify the daemon with `docker version`.
 
 ## Running Tests
 
@@ -111,7 +173,7 @@ To balance diagnostic depth with execution speed, `playwright.config.ts` collect
 - **Screenshot:** on failure
 - **Video:** retained on failure
 
-Artifacts are written locally to `playwright-report/` and `test-results/`; both are excluded from version control. Traces can be opened with `npx playwright show-trace path/to/trace.zip`.
+Artifacts are written locally to `playwright-report/` and `test-results/`; both are excluded from version control. Docker Compose mounts these directories to the host as well. Traces can be opened with `npx playwright show-trace path/to/trace.zip`.
 
 ## Code Quality
 
