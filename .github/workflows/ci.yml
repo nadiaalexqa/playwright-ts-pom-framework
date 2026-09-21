@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   schedule:
     # Nightly full regression at 07:00 UTC (02:00 EST)
     - cron: '0 7 * * *'
@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [ chromium, firefox ]
+        browser: [chromium, firefox]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -100,7 +100,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [ chromium, firefox ]
+        browser: [chromium, firefox]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
