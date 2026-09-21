@@ -3,7 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "test:smoke": "playwright test tests/smoke",
+    "test:regression": "playwright test tests/regression"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
